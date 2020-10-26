@@ -45,7 +45,7 @@ KNOWN_WIDTH = 11.3
 KNOWN_HEIGHT = 8.4
 
 # initialize the list of images that we'll be using
-IMAGE_PATHS = ["Picture1.jpg", "Picture2.jpg", "Picture4.jpg"]
+IMAGE_PATHS = ["pic/Picture1.jpg", "pic/Picture2.jpg", "pic/Picture4.jpg"]
 
 # load the furst image that contains an object that is KNOWN TO BE 2 feet
 # from our camera, then find the paper marker in the image, and initialize
