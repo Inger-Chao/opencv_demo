@@ -11,11 +11,27 @@ import numpy as np
 import argparse
 import imutils
 import cv2
+import random
 
+
+def showImage(title, src):
+    cv2.namedWindow(title, 0)
+    cv2.resizeWindow(title, 640, 480)
+    cv2.imshow(title, src)
 
 # 定义一个中点函数，后面会用到
 def midpoint(ptA, ptB):
     return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
+
+def ranstr(num):
+    # 猜猜变量名为啥叫 H
+    H = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+    salt = ''
+    for i in range(num):
+        salt += random.choice(H)
+
+    return salt
 
 
 # 设置一些需要改变的参数
@@ -32,12 +48,14 @@ image = cv2.imread(args["image"])
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 # 对灰度图片执行高斯滤波
 gray = cv2.GaussianBlur(gray, (7, 7), 0)
+# showImage("gaussian blur", gray)
 
 # 对滤波结果做边缘检测获取目标
 edged = cv2.Canny(gray, 50, 100)
 # 使用膨胀和腐蚀操作进行闭合对象边缘之间的间隙
 edged = cv2.dilate(edged, None, iterations=1)
 edged = cv2.erode(edged, None, iterations=1)
+# showImage("edged", edged)
 
 # 在边缘图像中寻找物体轮廓（即物体）
 cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
@@ -114,5 +132,6 @@ for c in cnts:
                 0.65, (255, 255, 255), 2)
 
     # 显示结果
-    cv2.imshow("Image", orig)
+    showImage("Image", orig)
+    # cv2.imwrite("./pic/" + ranstr(6) + ".jpg", orig)
     cv2.waitKey(0)

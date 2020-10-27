@@ -36,22 +36,22 @@ def distance_to_camera(knownWidth, focalLength, perWidth):
 # 初始化 A4 纸距离摄像头的距离
 # initialize the known distance from the camera to the object, which
 # in this case is 24 inches
-KNOWN_DISTANCE = 20.0
+KNOWN_DISTANCE = 27.56
 
 # initialize the known object width, which in this case, the piece of
 # paper is 11 inches wide
 # 初始化 A4 纸的长和宽(单位:inches)
-KNOWN_WIDTH = 11.3
-KNOWN_HEIGHT = 8.4
+KNOWN_WIDTH = 7.09
+KNOWN_HEIGHT = 10.24
 
 # initialize the list of images that we'll be using
-IMAGE_PATHS = ["pic/Picture1.jpg", "pic/Picture2.jpg", "pic/Picture4.jpg"]
+IMAGE_PATHS = ["pic/aoniphoto1.jpg", "pic/Picture2.jpg", "pic/Picture4.jpg"]
 
 # load the furst image that contains an object that is KNOWN TO BE 2 feet
 # from our camera, then find the paper marker in the image, and initialize
 # the focal length
 # 读入第一张图，通过已知距离计算相机焦距
-image = cv2.imread(IMAGE_PATHS[2])
+image = cv2.imread(IMAGE_PATHS[0])
 marker = find_marker(image)
 focalLength = (marker[1][0] * KNOWN_DISTANCE) / KNOWN_WIDTH
 
@@ -61,6 +61,9 @@ print('focalLength = ', focalLength)
 
 # 打开摄像头
 camera = cv2.VideoCapture(0)
+
+# camera.set(3, 300)
+# camera.set(4, 400)
 
 while camera.isOpened():
     # get a frame
@@ -83,7 +86,10 @@ while camera.isOpened():
                 2.0, (0, 255, 0), 3)
 
     # show a frame
+    cv2.namedWindow("capture", 0)  # 0可调大小，注意：窗口名必须imshow里面的一窗口名一直
+    cv2.resizeWindow("capture", 640, 480)  # 设置长和宽
     cv2.imshow("capture", frame)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 camera.release()
