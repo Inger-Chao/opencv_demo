@@ -66,20 +66,25 @@ def getContours(img,imgContour):
                         (0, 255, 0), 2)
 
 def main():
-    img = cv2.imread("pic/pipe/001松柏路-2A07WS0779~2A07WS0789，障碍物1级.png")
-    imgCopy = img.copy()
-    blured = cv2.GaussianBlur(img, (7,7), 1)
+    # img = cv2.imread("pic/pipe/001松柏路-2A07WS0779~2A07WS0789，障碍物1级.png")
+    img = cv2.imread("pic/pipe/002松柏路-2A07WS0789~2A07WS0779，破裂2级.png")
+    blured = cv2.GaussianBlur(img, (7, 7), 1)
     grayed = cv2.cvtColor(blured, cv2.COLOR_BGR2GRAY)
-    threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
-    threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
-    imgCanny = cv2.Canny(grayed, threshold1, threshold2)
-    kernel = np.ones((5, 5))
-    imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
-    getContours(imgDil, imgCopy)
-    imgStack = stackImages(0.8, ([img, imgCanny],
-                                 [imgDil, imgCopy]))
-    cv2.imshow("Result", imgStack)
+    while True:
 
-    cv2.waitKey(0)
+        imgCopy = img.copy()
+        threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
+        threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
+        imgCanny = cv2.Canny(grayed, threshold1, threshold2)
+        kernel = np.ones((5, 5))
+        imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
+        getContours(imgDil, imgCopy)
+        imgStack = stackImages(0.8, ([img, imgCanny],
+                                     [imgDil, imgCopy]))
+        cv2.imshow("Parameters", imgStack)
+
+        if cv2.waitKey(10) & 0xFF == ord("q"):
+            break
+    cv2.destroyAllWindows()
 
 main()
