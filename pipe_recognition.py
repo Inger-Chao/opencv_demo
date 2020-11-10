@@ -4,8 +4,10 @@
 
 import cv2
 import numpy as np
+import os
 
 
+path = "pic/pipe"
 
 def empty(a):
     pass
@@ -56,7 +58,8 @@ def getContours(img,imgContour):
             cv2.drawContours(imgContour, cnt, -1, (255, 0, 255), 7)
             peri = cv2.arcLength(cnt, True)
             approx = cv2.approxPolyDP(cnt, 0.02 * peri, True)
-            print(len(approx))
+            # print the quantity of points
+            # print(len(approx))
             x , y , w, h = cv2.boundingRect(approx)
             cv2.rectangle(imgContour, (x , y ), (x + w , y + h ), (0, 255, 0), 5)
 
@@ -66,25 +69,28 @@ def getContours(img,imgContour):
                         (0, 255, 0), 2)
 
 def main():
-    # img = cv2.imread("pic/pipe/001松柏路-2A07WS0779~2A07WS0789，障碍物1级.png")
-    img = cv2.imread("pic/pipe/002松柏路-2A07WS0789~2A07WS0779，破裂2级.png")
-    blured = cv2.GaussianBlur(img, (7, 7), 1)
-    grayed = cv2.cvtColor(blured, cv2.COLOR_BGR2GRAY)
-    while True:
 
-        imgCopy = img.copy()
-        threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
-        threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
-        imgCanny = cv2.Canny(grayed, threshold1, threshold2)
-        kernel = np.ones((5, 5))
-        imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
-        getContours(imgDil, imgCopy)
-        imgStack = stackImages(0.8, ([img, imgCanny],
-                                     [imgDil, imgCopy]))
-        cv2.imshow("Parameters", imgStack)
+    for filename in os.listdir(path):
+        print(filename)
+        img = cv2.imread(path + "/" + filename)
+        blured = cv2.GaussianBlur(img, (7, 7), 1)
+        grayed = cv2.cvtColor(blured, cv2.COLOR_BGR2GRAY)
+        while True:
 
-        if cv2.waitKey(10) & 0xFF == ord("q"):
-            break
+            imgCopy = img.copy()
+            threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
+            threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
+            imgCanny = cv2.Canny(grayed, threshold1, threshold2)
+            kernel = np.ones((5, 5))
+            imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
+            getContours(imgDil, imgCopy)
+            imgStack = stackImages(0.4, ([img, imgCanny],
+                                         [imgDil, imgCopy]))
+            cv2.imshow("Parameters", imgStack)
+
+            if cv2.waitKey(10) & 0xFF == ord("q"):
+                break
     cv2.destroyAllWindows()
+
 
 main()
