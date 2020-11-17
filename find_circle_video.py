@@ -4,7 +4,7 @@ import argparse
 import cv2
 import time
 
-cap = cv2.VideoCapture(0) # Set Capture Device, in case of a USB Webcam try 1, or give -1 to get a list of available devices
+cap = cv2.VideoCapture("videos/789-779-line.mp4") # Set Capture Device, in case of a USB Webcam try 1, or give -1 to get a list of available devices
 
 #Set Width and Height 
 cap.set(3,640)
@@ -13,8 +13,10 @@ cap.set(4,480)
 # The above step is to set the Resolution of the Video. The default is 640x480.
 # This example works with a Resolution of 640x480.
 
+
+
 while(True):
-	# Capture frame-by-frame
+	# Capture frame-by-frameq
 	ret, frame = cap.read()
 
 	# load the image, clone it for output, and then convert it to grayscale
@@ -42,7 +44,7 @@ while(True):
 	# print(img_size
 	
 	# detect circles in the image
-	circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, 260, param1=30, param2=65, minRadius=0, maxRadius=0)
+	circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, 260, param1=30, param2=65, minRadius=40, maxRadius=0)
 	# print(circles
 	
 	# ensure at least some circles were found
@@ -65,8 +67,10 @@ while(True):
 			print(r)
 
 	# Display the resulting frame
-		cv2.imshow('gray',gray)
-		cv2.imshow('frame',output)
+	# 	cv2.imshow('gray',gray)
+	cv2.namedWindow("frame")
+	cv2.resizeWindow("frame", 640, 480)
+	cv2.imshow('frame',output)
 	if cv2.waitKey(1) & 0xFF == ord('q'):
 		break
 

@@ -36,7 +36,6 @@ def mythreshold(imagepath):
     cv2.namedWindow("image")
     cv2.resizeWindow("image", 640, 480)
     cv2.createTrackbar("threshold1", "image", 23, 255, nothing)
-    cv2.createTrackbar("threshold2", "image", 45, 255, nothing)
 
     height, width = image_org.shape[:2]
     # 缩小图片
@@ -50,26 +49,19 @@ def mythreshold(imagepath):
 
 
     while True:
-        # mythreshold = cv2.getTrackbarPos("threshold1", "image")
-        # ret, image_bin = cv2.threshold(image_gray, mythreshold, 255,
-        #                                cv2.THRESH_BINARY)
-        threshold1 = cv2.getTrackbarPos("threshold1", "image")
-        threshold2 = cv2.getTrackbarPos("threshold2", "image")
-        imgCanny = cv2.Canny(image_gray, threshold1, threshold2)
-        image = image_org.copy()
-        getCircle(imgCanny, image)
+        mythreshold = cv2.getTrackbarPos("threshold1", "image")
+        ret, image_bin = cv2.threshold(image_gray, mythreshold, 255,
+                                       cv2.THRESH_BINARY)
 
-        cv2.namedWindow("result", 0)
-        cv2.resizeWindow("result", 640, 480)
-        cv2.imshow("result", image)
-        # cv2.imshow("image", imgCanny)
+
+        cv2.imshow("image", image_bin)
         if cv2.waitKey(10) & 0xFF == ord("q"):
             break
     cv2.destroyAllWindows()
 
 
 def main():
-    path = "/Users/inger/underground/789-779-line/00000085.jpg"
+    path = "/Users/inger/underground/longgang/00000057.jpg"
     mythreshold(path)
 
 

@@ -9,6 +9,7 @@ import os
 
 path = "pic/pipe"
 
+
 def empty(a):
     pass
 
@@ -49,6 +50,16 @@ def stackImages(scale,imgArray):
         ver = hor
     return ver
 
+def obstructLevel(img, area):
+
+    defects_ratio = area / float(img.size)
+    if(defects_ratio < 0.1):
+        return "Slight"
+    elif(defects_ratio <= 0.5):
+        return "Middle"
+    else:
+        return "Serious"
+
 def getContours(img,imgContour):
     contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     for cnt in contours:
@@ -63,10 +74,13 @@ def getContours(img,imgContour):
             x , y , w, h = cv2.boundingRect(approx)
             cv2.rectangle(imgContour, (x , y ), (x + w , y + h ), (0, 255, 0), 5)
 
-            cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w + 20, y + 20), cv2.FONT_HERSHEY_COMPLEX, .7,
-                        (0, 255, 0), 2)
+            # cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w + 20, y + 20), cv2.FONT_HERSHEY_COMPLEX, .7,
+            #             (0, 255, 0), 2)
             cv2.putText(imgContour, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_COMPLEX, 0.7,
                         (0, 255, 0), 2)
+            cv2.putText(imgContour, "Level: " + str(area/img.size),(x + w + 20, y + 20),
+                        cv2.FONT_HERSHEY_COMPLEX, .7,(0, 255, 0), 2 )
+
 
 def main():
 

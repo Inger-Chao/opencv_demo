@@ -5,28 +5,53 @@
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+import os
 
+path = "pic/pipe"
 
-#
-# def empty(a):
-#     pass
-#
-# cv2.namedWindow("Parameters", cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
-# cv2.resizeWindow("Parameters",640,240)
-# cv2.createTrackbar("Threshold1","Parameters",23,255,empty)
-# cv2.createTrackbar("Threshold2","Parameters",145,255,empty)
+def empty(a):
+    pass
 
-def showMultImg(imgs):
-    for i in range(1, len(imgs)):
-        plt.subplot(2, 2, i)
-        plt.imshow(imgs[i-1])
-        plt.xticks([])
-        plt.yticks([])
-    plt.show()
+cv2.namedWindow("Parameters")
+cv2.resizeWindow("Parameters",640,240)
+cv2.createTrackbar("Threshold1","Parameters",23,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",20,255,empty)
+cv2.createTrackbar("Area","Parameters",5000,30000,empty)
+
+def stackImages(scale,imgArray):
+    rows = len(imgArray)
+    cols = len(imgArray[0])
+    rowsAvailable = isinstance(imgArray[0], list)
+    width = imgArray[0][0].shape[1]
+    height = imgArray[0][0].shape[0]
+    if rowsAvailable:
+        for x in range ( 0, rows):
+            for y in range(0, cols):
+                if imgArray[x][y].shape[:2] == imgArray[0][0].shape [:2]:
+                    imgArray[x][y] = cv2.resize(imgArray[x][y], (0, 0), None, scale, scale)
+                else:
+                    imgArray[x][y] = cv2.resize(imgArray[x][y], (imgArray[0][0].shape[1], imgArray[0][0].shape[0]), None, scale, scale)
+                if len(imgArray[x][y].shape) == 2: imgArray[x][y]= cv2.cvtColor( imgArray[x][y], cv2.COLOR_GRAY2BGR)
+        imageBlank = np.zeros((height, width, 3), np.uint8)
+        hor = [imageBlank]*rows
+        hor_con = [imageBlank]*rows
+        for x in range(0, rows):
+            hor[x] = np.hstack(imgArray[x])
+        ver = np.vstack(hor)
+    else:
+        for x in range(0, rows):
+            if imgArray[x].shape[:2] == imgArray[0].shape[:2]:
+                imgArray[x] = cv2.resize(imgArray[x], (0, 0), None, scale, scale)
+            else:
+                imgArray[x] = cv2.resize(imgArray[x], (imgArray[0].shape[1], imgArray[0].shape[0]), None,scale, scale)
+            if len(imgArray[x].shape) == 2: imgArray[x] = cv2.cvtColor(imgArray[x], cv2.COLOR_GRAY2BGR)
+        hor= np.hstack(imgArray)
+        ver = hor
+    return ver
 
 def getCircle(img ,output):
     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 260,
-                               param1=30, param2=65, minRadius=0, maxRadius=0)
+                               param1=30, param2=65, minRadius=60, maxRadius=0)
 
     if circles is not None:
         circles = np.round(circles[0, :]).astype("int")
@@ -45,20 +70,28 @@ def getCircle(img ,output):
             print(r)
 
 
-img = cv2.imread('/Users/inger/underground/789-779-line/00000085.jpg')
-output = img.copy()
-imgBlur = cv2.GaussianBlur(img, (7, 7), 1)
-imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
-# threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
-# threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
-imgCanny = cv2.Canny(imgGray, 6, 136)
-kernel = np.ones((5, 5))
-imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
-getCircle(imgDil, output)
+def main():
+    for filename in os.listdir(path):
+        print(filename)
+        img = cv2.imread(path + "/" + filename)
 
-cv2.namedWindow("result", 0)
-cv2.resizeWindow("result", 640, 480)
-cv2.imshow("result", output)
-cv2.waitKey(0)
-showMultImg([img, imgCanny, imgDil])
-cv2.destroyAllWindows()
+        imgBlur = cv2.GaussianBlur(img, (7, 7), 1)
+        imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
+        while True:
+            threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
+            threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
+            imgCanny = cv2.Canny(imgGray, threshold1, threshold2)
+            kernel = np.ones((5, 5))
+            imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
+            output = img.copy()
+            getCircle(imgDil, output)
+
+            imgStack = stackImages(0.4, ([img, imgCanny],
+                                         [imgDil, output]))
+            cv2.imshow("Parameters", imgStack)
+
+            if cv2.waitKey(10) & 0xFF == ord("q"):
+                break
+    cv2.destroyAllWindows()
+
+main()
